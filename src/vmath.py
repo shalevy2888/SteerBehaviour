@@ -17,9 +17,9 @@ class Vector:
         return self.x**2 + self.y**2
 
     def truncate(self, v):
-        l = self.length()
-        if (l>v):
-            return (self / l) * v
+        ln = self.length()
+        if (ln>v):
+            return (self / ln) * v
         return self
 
     def normalize(self):
@@ -42,7 +42,8 @@ class Vector:
         return Vector(self.x / scalar, self.y / scalar)
 
     def __eq__(self, other):
-        if (other is None): return False
+        if (other is None):
+            return False
         return self.x == other.x and self.y == other.y
 
     def __repr__(self):
@@ -54,28 +55,27 @@ class Vector:
                 self.y, other.y, abs_tol=epsilon)
 
     def setAngle(self, angle):
-        return Vector(math.cos(angle)*self.length(), math.sin(angle)*self.length())
+        return Vector(math.cos(angle) * self.length(), math.sin(angle) * self.length())
 
 
 def getAngleFrom(newPosition, oldPosition):
     ydt = newPosition.y - oldPosition.y
     xdt = newPosition.x - oldPosition.x
 
-    angle = 0
+    angle = 0.0
     if (ydt != 0 and xdt != 0):
-        hyp = math.sqrt(math.pow(xdt, 2)+math.pow(ydt, 2))
+        hyp = math.sqrt(math.pow(xdt, 2) + math.pow(ydt, 2))
         if (ydt >= 0):
-            angle = math.asin(ydt/hyp)
+            angle = math.asin(ydt / hyp)
             if (xdt <0):
-                angle += 2*(math.pi/2 - angle)
+                angle += 2 * (math.pi / 2 - angle)
         else:
-            angle = math.asin((-ydt)/hyp)
+            angle = math.asin((-ydt) / hyp)
             if (xdt <0):
                 angle += math.pi
             else:
-                angle = 2*math.pi-angle
+                angle = 2 * math.pi - angle
     else:
         return None
 
     return angle
-
