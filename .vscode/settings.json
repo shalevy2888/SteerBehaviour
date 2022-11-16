@@ -1,0 +1,7 @@
+{
+    "cSpell.words": [
+        "Targetable",
+        "vmath"
+    ],
+    "python.analysis.extraPaths": ["src"]
+}

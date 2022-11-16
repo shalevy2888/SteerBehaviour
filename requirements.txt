@@ -1,3 +1,7 @@
 flake8==5.0.4
 mypy==0.971
 pygame==2.1.2
+tox==3.24.3
+pytest==6.2.5
+pytest-cov==2.12.1
+nbformat==5.5.0
