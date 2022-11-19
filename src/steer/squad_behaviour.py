@@ -1,7 +1,7 @@
 from steer.squad import Squad, SquadForceFunc
 from steer.steer_behaviour import follow, separation, seek
 from steer.steer_behaviour import wander as steer_wander
-from movable_entity import MovableEntity, Waypoint
+from steer.movable_entity import MovableEntity, Waypoint
 from infra.vmath import Vector
 from typing import Optional
 
@@ -42,7 +42,7 @@ def wander(squad, xymin, width, height):
                 new_leader.steer_force = steer_wander()
             else:
                 new_leader.steer_force = leader.steer_force  # type: ignore
-            new_leader.target = MovableEntity.Waypoint.NAWaypoint()
+            new_leader.target = Waypoint.NAWaypoint()
             set_entities_follow_target(squad, new_leader, False)
             leader = new_leader
 
@@ -51,7 +51,7 @@ def wander(squad, xymin, width, height):
 
         if leader.pos.x < xymin or leader.pos.x > (width - xymin) or \
                 leader.pos.y < xymin or leader.pos.y > (height - xymin):
-            leader.target = MovableEntity.Waypoint(Vector(width / 2, height / 2))
+            leader.target = Waypoint(Vector(width / 2, height / 2))
             leader.steerForce = seek(0)
             seek_waypoint = True
         elif seek_waypoint is True:
