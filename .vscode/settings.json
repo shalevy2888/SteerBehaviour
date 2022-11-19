@@ -1,7 +1,13 @@
 {
     "cSpell.words": [
+        "blit",
+        "centerx",
+        "centery",
+        "fpos",
+        "pygame",
         "Targetable",
-        "vmath"
+        "vmath",
+        "xymin"
     ],
     "python.analysis.extraPaths": ["src"]
 }

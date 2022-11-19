@@ -1,66 +1,70 @@
+from __future__ import annotations
+from typing import Optional
 import math
 
 
 class Vector:
-    def __init__(self, _x=0, _y=0):
-        self.x = _x
-        self.y = _y
+    def __init__(self, x: float = 0, y: float = 0):
+        self.x = x
+        self.y = y
 
     @staticmethod
-    def zero():
+    def zero() -> Vector:
         return Vector(0, 0)
 
-    def length(self):
+    def length(self) -> float:
         return math.sqrt(self.x**2 + self.y**2)
 
-    def sqrLength(self):
+    def sqr_length(self) -> float:
         return self.x**2 + self.y**2
 
-    def truncate(self, v):
+    def truncate(self, v: float) -> Vector:
         ln = self.length()
         if (ln>v):
             return (self / ln) * v
         return self
 
-    def normalize(self):
+    def normalize(self) -> Vector:
         try:
             n = 1 / self.length()
         except ZeroDivisionError:
             return Vector(0, 0)
         return self * n
 
-    def __add__(self, other):
+    def __add__(self, other: Vector) -> Vector:
         return Vector(self.x + other.x, self.y + other.y)
 
-    def __sub__(self, other):
+    def __sub__(self, other: Vector) -> Vector:
         return Vector(self.x - other.x, self.y - other.y)
 
-    def __mul__(self, scalar):
+    def __mul__(self, scalar: float) -> Vector:
         return Vector(self.x * scalar, self.y * scalar)
     
-    def __truediv__(self, scalar):
+    def __truediv__(self, scalar: float) -> Vector:
         return Vector(self.x / scalar, self.y / scalar)
 
-    def __eq__(self, other):
-        if (other is None):
-            return False
-        return self.x == other.x and self.y == other.y
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Vector):
+            return NotImplemented
+        return (self.x == other.x) and (self.y == other.y)
 
-    def __repr__(self):
-        return f"Vector({self.x},{self.y})"
+    def __repr__(self) -> str:
+        return f"Vector({self.x:.4f},{self.y:.4f})"
 
-    def eqEpsilon(self, other, epsilon=0.001):
+    def almost_eq(self, other: object, epsilon: float = 0.001) -> bool:
+        if not isinstance(other, Vector):
+            return NotImplemented
         return math.isclose(
             self.x, other.x, abs_tol=epsilon) and math.isclose(
                 self.y, other.y, abs_tol=epsilon)
 
-    def setAngle(self, angle):
+    def set_angle(self, angle: float) -> Vector:
         return Vector(math.cos(angle) * self.length(), math.sin(angle) * self.length())
 
 
-def getAngleFrom(newPosition, oldPosition):
-    ydt = newPosition.y - oldPosition.y
-    xdt = newPosition.x - oldPosition.x
+def get_angle_from(new_position: Vector, old_position: Vector) -> Optional[float]:
+    ydt = new_position.y - old_position.y
+    xdt = new_position.x - old_position.x
 
     angle = 0.0
     if (ydt != 0 and xdt != 0):
