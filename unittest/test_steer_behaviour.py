@@ -1,7 +1,7 @@
 import unittest
-from movable_entity import MovableEntity, Waypoint
-from steer_behaviour import seek, flee, wander, pursuit
-from vmath import Vector
+from steer.movable_entity import MovableEntity, Waypoint
+from steer.steer_behaviour import seek, flee, wander, pursuit
+from infra.vmath import Vector
 
 class TestSteerBehaviour(unittest.TestCase):
     

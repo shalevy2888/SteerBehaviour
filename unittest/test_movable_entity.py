@@ -1,7 +1,7 @@
-from movable_entity import MovableEntity
+from steer.movable_entity import MovableEntity
 import unittest
 
-from vmath import Vector
+from infra.vmath import Vector
 
 class TestMovableEntity(unittest.TestCase):
     

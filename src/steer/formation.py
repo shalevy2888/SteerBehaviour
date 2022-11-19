@@ -1,5 +1,5 @@
 import math
-from vmath import Vector
+from infra.vmath import Vector
 
 class Formation:
     def __init__(self):

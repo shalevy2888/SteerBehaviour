@@ -1,10 +1,10 @@
 from __future__ import annotations
 import math
 import random
-from movable_entity import Waypoint, MovableEntity
-from vmath import Vector
-from formation import Formation
-from squad import Squad
+from steer.movable_entity import Waypoint, MovableEntity
+from infra.vmath import Vector
+from steer.formation import Formation
+from steer.squad import Squad
 from typing import Callable, Optional
 
 SteeringForceFunc = Callable[[MovableEntity, Waypoint], Vector]

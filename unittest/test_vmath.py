@@ -1,9 +1,9 @@
 import unittest
-import sys
+# import sys
 
-sys.path.append('.')
+# sys.path.append('.')
 
-from src.vmath import Vector
+from infra.vmath import Vector
 
 class TestVmath(unittest.TestCase):
     def test_length(self):

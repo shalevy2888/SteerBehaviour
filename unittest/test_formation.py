@@ -1,7 +1,7 @@
-from formation import FormationDiamond, FormationColumn, Formation
+from steer.formation import FormationDiamond, FormationColumn, Formation
 import unittest
 
-from vmath import Vector
+from infra.vmath import Vector
 
 class TestFormation(unittest.TestCase):
     

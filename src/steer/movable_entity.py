@@ -1,7 +1,6 @@
 from __future__ import annotations
 import abc
-import vmath
-from vmath import Vector
+from infra.vmath import Vector, get_angle_from
 
 
 class Targetable(abc.ABC):
@@ -40,7 +39,7 @@ class MovableEntity(Targetable):
         force = self.steer_force.f(self, self.target).truncate(self.max_force) / self.mass  # type: ignore
         self.velocity = (self.velocity + force).truncate(self.max_speed)
         self.pos = self.pos + (self.velocity * dt)
-        angle = vmath.get_angle_from(self.velocity, Vector.zero())
+        angle = get_angle_from(self.velocity, Vector.zero())
         if angle is not None:
             self.rotation = angle  # + math.pi / 2
         return self

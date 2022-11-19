@@ -1,8 +1,8 @@
 from typing import List
-from vmath import Vector
+from infra.vmath import Vector
 # from steer_behaviour import
-from movable_entity import MovableEntity
-from formation import Formation
+from steer.movable_entity import MovableEntity
+from steer.formation import Formation
 from typing import Callable, Optional
 
 SquadForceFunc = Callable[[], None]

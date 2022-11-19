@@ -1,9 +1,9 @@
 import pygame
 import sys
 from pygame.math import Vector2
-from sprite import MySprite
-from movable_entity import MovableEntity, Waypoint
-from steer_behaviour import wander
+from gfx.sprite import MySprite
+from steer.movable_entity import MovableEntity, Waypoint
+from steer.steer_behaviour import wander
 # from vmath import get_angle_from, Vector
 # from math import pi, acos
 # import math

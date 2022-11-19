@@ -1,8 +1,8 @@
-from squad import Squad, SquadForceFunc
-from steer_behaviour import follow, separation, seek
-from steer_behaviour import wander as steer_wander
+from steer.squad import Squad, SquadForceFunc
+from steer.steer_behaviour import follow, separation, seek
+from steer.steer_behaviour import wander as steer_wander
 from movable_entity import MovableEntity, Waypoint
-from vmath import Vector
+from infra.vmath import Vector
 from typing import Optional
 
 class SquadBehaviour:

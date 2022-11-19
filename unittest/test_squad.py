@@ -1,9 +1,9 @@
-from squad import Squad
-from formation import FormationDiamond
-from movable_entity import MovableEntity
+from steer.squad import Squad
+from steer.formation import FormationDiamond
+from steer.movable_entity import MovableEntity
 import unittest
 
-from vmath import Vector
+from infra.vmath import Vector
 
 class TestSquad(unittest.TestCase):
     
