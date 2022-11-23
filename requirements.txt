@@ -6,4 +6,3 @@ pytest==6.2.5
 pytest-cov==2.12.1
 nbformat==5.5.0
 pep8-naming==0.13.2
-black==22.10.0
