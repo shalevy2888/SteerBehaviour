@@ -1,10 +1,12 @@
-from steer.formation import FormationDiamond, FormationColumn, Formation
 import unittest
 
 from infra.vmath import Vector
+from steer.formation import Formation
+from steer.formation import FormationColumn
+from steer.formation import FormationDiamond
+
 
 class TestFormation(unittest.TestCase):
-    
     def test_Diamond(self):
         f = FormationDiamond()
         self.assertEqual(f.entity_position(5), Vector(50, -50))
@@ -27,6 +29,7 @@ class TestFormation(unittest.TestCase):
     def test_Column(self):
         f1 = FormationColumn()
         self.assertEqual(f1.entity_position(5), Vector(0, -150))
+
 
 if __name__ == '__main__':
     unittest.main()

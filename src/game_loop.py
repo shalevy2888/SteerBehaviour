@@ -1,19 +1,24 @@
-import pygame
 import sys
+
+import pygame
 from pygame.math import Vector2
+
 from gfx.sprite import MySprite
-from steer.movable_entity import MovableEntity, Waypoint
-# from steer.steer_behaviour import wander
+from infra.vmath import Vector
+from steer.formation import FormationDiamond
+from steer.movable_entity import MovableEntity
+from steer.movable_entity import Waypoint
 from steer.squad import Squad
 from steer.squad_behaviour import wander as squad_wander
-from steer.formation import FormationDiamond
-from infra.vmath import Vector
+
+# from steer.steer_behaviour import wander
 
 # from math import pi, acos
 # import math
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
+
 
 class Ship(MySprite, MovableEntity):
     def __init__(self, position):
@@ -24,7 +29,7 @@ class Ship(MySprite, MovableEntity):
         self.movement: Vector2 = Vector2(0.0, 0.0)
         self.angle: float = 0.0
         self.rect.center = position
-        
+
         # Moveable entity
         self.max_speed = 80.0
         self.max_force = 25.0
@@ -35,19 +40,19 @@ class Ship(MySprite, MovableEntity):
         global screen
         # self.update_steer_behaviour(dt)
         # self.movement = Vector2(self.velocity.x, self.velocity.y)
-        
+
         # self.get_input()
         velocity_vector2 = Vector2(self.velocity.x, self.velocity.y)
         angle_to: float = velocity_vector2.angle_to(Vector2(0, 1))
         self.angle = angle_to + 180
         # print(velocity_vector2, self.angle)
-        
+
         # print(self.angle, self.forward, self.movement)
         rot_image = pygame.transform.rotate(self.orig_image, self.angle)
         self.rect = rot_image.get_rect(center=self.fpos)
         # self.fpos = self.fpos + self.movement
         self.fpos = Vector2(self.pos.x, self.pos.y)
-        
+
         # vertical correction to screen height
         if self.fpos.y < (-self.rect.height / 2):
             self.fpos.y = screen.get_height() + self.fpos.y
@@ -61,6 +66,7 @@ class Ship(MySprite, MovableEntity):
 
         self.rect.center = (int(self.fpos.x), int(self.fpos.y))
         self.image = rot_image
+
 
 class Level:
     def __init__(self, surface):
@@ -99,7 +105,7 @@ level = Level(screen)
 def game_loop():
     game_over = False
     ticks_last_frame: float = pygame.time.get_ticks()
- 
+
     while not game_over:
         # check for events
         for event in pygame.event.get():
@@ -109,7 +115,7 @@ def game_loop():
         t = pygame.time.get_ticks()
         dt = (t - ticks_last_frame) / 1000.0
         ticks_last_frame = t
-        
+
         level.run(dt)
 
         pygame.display.update()

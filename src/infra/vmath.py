@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+
 import math
 
 
@@ -20,7 +20,7 @@ class Vector:
 
     def truncate(self, v: float) -> Vector:
         ln = self.length()
-        if (ln>v):
+        if ln > v:
             return (self / ln) * v
         return self
 
@@ -39,7 +39,7 @@ class Vector:
 
     def __mul__(self, scalar: float) -> Vector:
         return Vector(self.x * scalar, self.y * scalar)
-    
+
     def __truediv__(self, scalar: float) -> Vector:
         return Vector(self.x / scalar, self.y / scalar)
 
@@ -54,28 +54,28 @@ class Vector:
     def almost_eq(self, other: object, epsilon: float = 0.001) -> bool:
         if not isinstance(other, Vector):
             return NotImplemented
-        return math.isclose(
-            self.x, other.x, abs_tol=epsilon) and math.isclose(
-                self.y, other.y, abs_tol=epsilon)
+        return math.isclose(self.x, other.x, abs_tol=epsilon) and math.isclose(
+            self.y, other.y, abs_tol=epsilon
+        )
 
     def set_angle(self, angle: float) -> Vector:
         return Vector(math.cos(angle) * self.length(), math.sin(angle) * self.length())
 
 
-def get_angle_from(new_position: Vector, old_position: Vector) -> Optional[float]:
+def get_angle_from(new_position: Vector, old_position: Vector) -> float | None:
     ydt = new_position.y - old_position.y
     xdt = new_position.x - old_position.x
 
     angle = 0.0
-    if (ydt != 0 and xdt != 0):
+    if ydt != 0 and xdt != 0:
         hyp = math.sqrt(math.pow(xdt, 2) + math.pow(ydt, 2))
-        if (ydt >= 0):
+        if ydt >= 0:
             angle = math.asin(ydt / hyp)
-            if (xdt <0):
+            if xdt < 0:
                 angle += 2 * (math.pi / 2 - angle)
         else:
             angle = math.asin((-ydt) / hyp)
-            if (xdt <0):
+            if xdt < 0:
                 angle += math.pi
             else:
                 angle = 2 * math.pi - angle

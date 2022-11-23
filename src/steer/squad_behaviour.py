@@ -1,9 +1,15 @@
-from steer.squad import Squad, SquadForceFunc
-from steer.steer_behaviour import follow, separation, seek
-from steer.steer_behaviour import wander as steer_wander
-from steer.movable_entity import MovableEntity, Waypoint
-from infra.vmath import Vector
 from typing import Optional
+
+from infra.vmath import Vector
+from steer.movable_entity import MovableEntity
+from steer.movable_entity import Waypoint
+from steer.squad import Squad
+from steer.squad import SquadForceFunc
+from steer.steer_behaviour import follow
+from steer.steer_behaviour import seek
+from steer.steer_behaviour import separation
+from steer.steer_behaviour import wander as steer_wander
+
 
 class SquadBehaviour:
     def __init__(self, _f: Optional[SquadForceFunc] = None):
@@ -13,7 +19,10 @@ class SquadBehaviour:
         if self.f is not None:
             return self.f()
 
-def set_entities_follow_target(squad: Squad, leader: MovableEntity, follow_front_entity: bool):
+
+def set_entities_follow_target(
+    squad: Squad, leader: MovableEntity, follow_front_entity: bool
+):
     for entity in squad.active_iter():
         if entity is not leader:
             formation_vector = Vector.zero()
@@ -48,8 +57,12 @@ def wander(squad, xymin, width, height):
 
         if leader is None:
             return
-        if leader.pos.x < xymin or leader.pos.x > (width - xymin) or \
-                leader.pos.y < xymin or leader.pos.y > (height - xymin):
+        if (
+            leader.pos.x < xymin
+            or leader.pos.x > (width - xymin)
+            or leader.pos.y < xymin
+            or leader.pos.y > (height - xymin)
+        ):
             if seek_waypoint is False:
                 leader.target = Waypoint(Vector(width / 2, height / 2))
                 leader.steer_force = seek(0)
@@ -60,5 +73,5 @@ def wander(squad, xymin, width, height):
             leader.target = Waypoint.NAWaypoint()
             seek_waypoint = False
             # print('wander', leader.pos)
-    
+
     return SquadBehaviour(squad_force)

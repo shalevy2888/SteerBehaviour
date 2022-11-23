@@ -1,17 +1,18 @@
 import unittest
-from steer.movable_entity import MovableEntity
-from steer.squad_behaviour import wander
-from steer.squad import Squad
+
 from steer.formation import FormationDiamond
+from steer.movable_entity import MovableEntity
+from steer.squad import Squad
+from steer.squad_behaviour import wander
+
 
 class TestSquadBehaviour(unittest.TestCase):
-    
     def test_wander(self):
         s1 = Squad()
         s1.entities = [MovableEntity() for _ in range(3)]
         s1.formation = FormationDiamond()
         s1.squad_behaviour = wander(s1, 30, 800, 800)
-        
+
         # Leader will seek the middle of the screen, with default force of 30 in 1 sec it should travel
         # from (0,0) to (waypoint(400,400)-pos(0,0)).normalized * 30 / 10(mass) = (2.1213, 2.1213)
         s1.update_squad_behaviour(dt=1)
@@ -25,7 +26,7 @@ class TestSquadBehaviour(unittest.TestCase):
         # which will lead his in the exact opposite direction
         self.assertAlmostEqual(s1.entities[1].pos.x, -2.1213, places=4)
         self.assertAlmostEqual(s1.entities[1].pos.y, -2.1213, places=4)
-        
+
 
 if __name__ == '__main__':
     unittest.main()
