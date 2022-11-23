@@ -8,7 +8,6 @@ from steer.squad import Squad
 from steer.squad_behaviour import wander as squad_wander
 from steer.formation import FormationDiamond
 from infra.vmath import Vector
-from typing import List
 
 # from math import pi, acos
 # import math
