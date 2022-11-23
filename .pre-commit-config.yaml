@@ -15,6 +15,8 @@ repos:
     -   id: check-yaml
     -   id: check-added-large-files
     -   id: debug-statements
+    -   id: check-merge-conflict
+    -   id: check-toml
         language_version: python3
 
 -   repo: https://github.com/PyCQA/flake8
@@ -50,3 +52,9 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+
+-   repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.9.0
+    hooks:
+    -   id: python-check-blanket-noqa
+    -   id: python-check-blanket-type-ignore

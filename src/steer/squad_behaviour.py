@@ -50,7 +50,7 @@ def wander(squad, xymin, width, height):
             if leader is None:
                 new_leader.steer_force = steer_wander()
             else:
-                new_leader.steer_force = leader.steer_force  # type: ignore
+                new_leader.steer_force = leader.steer_force
             new_leader.target = Waypoint.NAWaypoint()
             set_entities_follow_target(squad, new_leader, False)
             leader = new_leader

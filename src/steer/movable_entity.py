@@ -43,10 +43,10 @@ class MovableEntity(Targetable):
         return Waypoint(self.pos + shift_by)
 
     def update_steer_behaviour(self, dt: float) -> MovableEntity:
-        if self.steer_force is None or self.target is None:  # type: ignore
+        if self.steer_force is None or self.target is None:  # type: ignore[unreachable]
             return self
 
-        force = self.steer_force.f(self, self.target).truncate(self.max_force) / self.mass  # type: ignore
+        force = self.steer_force.f(self, self.target).truncate(self.max_force) / self.mass  # type: ignore[unreachable]
         self.velocity = (self.velocity + force).truncate(
             self.max_speed * self.speed_mul
         )
