@@ -23,8 +23,8 @@ class Squad:
         return len(list(self.active_iter()))
 
     def get_index_of_entity(self, entity):
-        """ returns the index of entity in the squad based on the active entities. Basically counting the
-            number of active entities till reaching the requested one and returning the count """
+        # returns the index of entity in the squad based on the active entities. Basically counting the
+        # number of active entities till reaching the requested one and returning the count
         return next((i for i, e1 in enumerate(self.active_iter()) if e1 == entity), None)
 
     def get_entity_by_index(self, index):
@@ -45,7 +45,7 @@ class Squad:
                                                    self._get_position_delta(from_entity))
 
     def get_member_in_front_of(self, entity):
-        """ return the entity in front of the given entity, which means the entity in index-1 of the given entity index """
+        # return the entity in front of the given entity, which means the entity in index-1 of the given entity index
         # not a very efficient implementation since we traverse the list twice inside of just once
         index = self.get_index_of_entity(entity)
         return None if index is None else self.get_entity_by_index(index - 1)

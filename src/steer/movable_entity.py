@@ -1,10 +1,14 @@
 from __future__ import annotations
 import abc
 from infra.vmath import Vector, get_angle_from
-
+import math
+from itertools import count
 
 class Targetable(abc.ABC):
+    id = count(0)
+    
     def __init__(self, v: Vector = Vector()):
+        self.name = f'e{next(Targetable.id)}'
         self.pos: Vector = v
         self.velocity: Vector = Vector()
 
@@ -18,9 +22,11 @@ class Waypoint(Targetable):
 class MovableEntity(Targetable):
     def __init__(self, v: Vector = Vector()):
         Targetable.__init__(self, v)
+        # print(self.name)
         self.is_active = True
         self.max_force: float = 30.0
         self.max_speed: float = 80.0
+        self.speed_mul: float = 1.0  # to be used when following
         self.rotation: float = 0.0
         self.mass: float = 10.0
         self.steer_force = None
@@ -37,10 +43,11 @@ class MovableEntity(Targetable):
             return self
         
         force = self.steer_force.f(self, self.target).truncate(self.max_force) / self.mass  # type: ignore
-        self.velocity = (self.velocity + force).truncate(self.max_speed)
+        self.velocity = (self.velocity + force).truncate(self.max_speed * self.speed_mul)
+        self.speed_mul = 1.0  # speed_mul needs to be reapplied by the force function
         self.pos = self.pos + (self.velocity * dt)
         angle = get_angle_from(self.velocity, Vector.zero())
         if angle is not None:
-            self.rotation = angle  # + math.pi / 2
+            self.rotation = angle + math.pi / 2
         return self
         

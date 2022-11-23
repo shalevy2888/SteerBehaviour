@@ -48,12 +48,10 @@ def seek(slow_radius: float) -> SteeringForce:
     def steering_force(entity: MovableEntity, waypoint: Waypoint) -> Vector:
         desired_vector = waypoint.pos - entity.pos
         distance = desired_vector.length()
-        target_speed = entity.max_force
+        target_force = entity.max_force
         if (distance < slow_radius):
-            target_speed = target_speed * distance / slow_radius
-        desired_velocity = desired_vector.normalize() * target_speed
-        force = (desired_velocity - entity.velocity)
-        return force
+            target_force = target_force * distance / slow_radius
+        return desired_vector.normalize() * target_force
 
     return SteeringForce(steering_force)
 
@@ -93,20 +91,24 @@ def evade() -> SteeringForce:
 
 ahead_search_time = 0.5
 separation_added_force_magnitude = 80.0
-ahead_check_radius = 15.0
-follow_slow_radius = 20.0
+ahead_check_radius = 35.0
+follow_slow_radius = 30.0
 separation_radius = 15.0
 
 # TODO: Need to write test
 def follow(distance) -> SteeringForce:
     def steering_force(entity: MovableEntity, leader: Waypoint):
         ahead = leader.pos + leader.velocity * ahead_search_time
-        if (entity.pos - ahead).length() < ahead_check_radius or (entity.pos - leader.pos).length() < ahead_check_radius:
+        distance_from_leader = min((entity.pos - ahead).length(), (entity.pos - leader.pos).length())
+        if distance_from_leader < ahead_check_radius:
             return evade()(entity, leader)
+        elif distance_from_leader < (ahead_check_radius * 1.5):
+            entity.speed_mul = 1
         else:
-            rot = leader.rotation - math.pi
-            shaped_distance = Formation.Formation.rotate(distance, rot)
-            return seek(follow_slow_radius)(entity, leader.shift(shaped_distance))
+            entity.speed_mul = 1.2
+        rot = leader.rotation - math.pi
+        shaped_distance = Formation.rotate(distance, rot)
+        return seek(follow_slow_radius)(entity, leader.shift(shaped_distance))
     return SteeringForce(steering_force)
 
 def separation(squad: Squad):

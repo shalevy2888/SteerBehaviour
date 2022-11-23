@@ -17,7 +17,7 @@ class TestSteerBehaviour(unittest.TestCase):
         f = seek((w.pos - e.pos).length() * slow_radius_factor)  # getting the force function again with new slow radius
         self.assertAlmostEqual(f(e, w).length(), e.max_force / slow_radius_factor)
 
-    def test_addingForces(self):
+    def test_adding_forces(self):
         w = Waypoint(Vector(30, 9))
         e = MovableEntity(Vector(1, 1))
         f1 = seek(20)
@@ -25,7 +25,7 @@ class TestSteerBehaviour(unittest.TestCase):
         f3 = f1 + f2
         self.assertAlmostEqual(f3(e, w).length(), e.max_force * 2)
     
-    def test_multiplyForceWithScalar(self):
+    def test_multiply_force_with_scalar(self):
         w = Waypoint(Vector(30, 9))
         e = MovableEntity(Vector(1, 1))
         f1 = seek(20)
@@ -53,7 +53,7 @@ class TestSteerBehaviour(unittest.TestCase):
         print(f7(e, None))
         print(f7(e, None))
     
-    def test_updateSteerBehaviour(self):
+    def test_update_steer_behaviour(self):
         w = Waypoint(Vector(3, 4))
         e = MovableEntity(Vector(1, 1))
         e.steer_force = seek(1)

@@ -14,24 +14,24 @@ class SquadBehaviour:
             return self.f()
 
 def set_entities_follow_target(squad: Squad, leader: MovableEntity, follow_front_entity: bool):
-    for entity in squad.activeIter():
+    for entity in squad.active_iter():
         if entity is not leader:
             formation_vector = Vector.zero()
             if follow_front_entity is True:
-                entity_in_front = squad.getMemberInFrontOf(entity)
+                entity_in_front = squad.get_member_in_front_of(entity)
                 if entity_in_front is not None:
-                    formation_vector = squad.getPositionDelta(entity, entity_in_front)
+                    formation_vector = squad.get_position_delta(entity, entity_in_front)
                     entity.target = entity_in_front
             else:
-                formation_vector = squad.getPositionDelta(entity, leader)
+                formation_vector = squad.get_position_delta(entity, leader)
                 entity.target = leader
 
-            entity.steerForce = follow(formation_vector) + separation(squad)
+            entity.steer_force = follow(formation_vector) + separation(squad)
 
 
 def wander(squad, xymin, width, height):
-    leader = None
-    seek_waypoint = False
+    leader: MovableEntity = None
+    seek_waypoint: Waypoint = False
 
     def squad_force():
         nonlocal leader
@@ -48,15 +48,17 @@ def wander(squad, xymin, width, height):
 
         if leader is None:
             return
-
         if leader.pos.x < xymin or leader.pos.x > (width - xymin) or \
                 leader.pos.y < xymin or leader.pos.y > (height - xymin):
-            leader.target = Waypoint(Vector(width / 2, height / 2))
-            leader.steerForce = seek(0)
-            seek_waypoint = True
+            if seek_waypoint is False:
+                leader.target = Waypoint(Vector(width / 2, height / 2))
+                leader.steer_force = seek(0)
+                seek_waypoint = True
+            # print('seek', leader.target.pos, leader.pos)
         elif seek_waypoint is True:
-            leader.steerForce = steer_wander()
+            leader.steer_force = steer_wander()
             leader.target = Waypoint.NAWaypoint()
             seek_waypoint = False
+            # print('wander', leader.pos)
     
     return SquadBehaviour(squad_force)

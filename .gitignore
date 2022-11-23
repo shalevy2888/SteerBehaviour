@@ -1,6 +1,7 @@
 # My ignore files
 markdown-cheat-sheet.md
 git-cheat-sheet-education.pdf
+resuls*.txt
 
 .DS_Store
 src/.DS_Store

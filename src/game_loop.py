@@ -3,8 +3,13 @@ import sys
 from pygame.math import Vector2
 from gfx.sprite import MySprite
 from steer.movable_entity import MovableEntity, Waypoint
-from steer.steer_behaviour import wander
-# from vmath import get_angle_from, Vector
+# from steer.steer_behaviour import wander
+from steer.squad import Squad
+from steer.squad_behaviour import wander as squad_wander
+from steer.formation import FormationDiamond
+from infra.vmath import Vector
+from typing import List
+
 # from math import pi, acos
 # import math
 
@@ -13,8 +18,8 @@ SCREEN_HEIGHT = 800
 
 class Ship(MySprite, MovableEntity):
     def __init__(self, position):
-        MovableEntity.__init__(self)
-        self.orig_image = pygame.image.load('images/PlayerShipBlaster1@2x.png')
+        MovableEntity.__init__(self, Vector(position[0], position[1]))
+        self.orig_image = pygame.image.load('images/PlayerShipBlaster1.png')
         super().__init__(self.orig_image.copy(), position, True, False)
         self.fpos: Vector2 = Vector2(0.0, 0.0)
         self.movement: Vector2 = Vector2(0.0, 0.0)
@@ -24,12 +29,12 @@ class Ship(MySprite, MovableEntity):
         # Moveable entity
         self.max_speed = 80.0
         self.max_force = 25.0
-        self.steer_force = wander()
+        # self.steer_force = wander()
         self.target = Waypoint.NAWaypoint()
 
     def update(self, dt: float):
         global screen
-        self.update_steer_behaviour(dt)
+        # self.update_steer_behaviour(dt)
         # self.movement = Vector2(self.velocity.x, self.velocity.y)
         
         # self.get_input()
@@ -66,17 +71,23 @@ class Level:
     def setup_level(self):
         self.players = pygame.sprite.Group()  # GroupSingle()
         # self.background = pygame.image.load('images/space.png')
-        self.players.add(Ship([100, 100]))
+        self.s1 = Squad()
+        self.s1.entities = [Ship([100, 100]) for _ in range(8)]
+        self.s1.formation = FormationDiamond()
+        self.s1.squad_behaviour = squad_wander(self.s1, 30, SCREEN_WIDTH, SCREEN_HEIGHT)
+        for e in self.s1.entities:
+            self.players.add(e)
 
     def run(self, dt: float) -> None:
         # draw level
         screen.fill("black")
         # self.display_surface.blit(self.background, [0, 0])
-
+        self.s1.update_squad_behaviour(dt)
         # player
+        player: MySprite
         for player in self.players:
             player.update(dt)
-            player.draw(self.display_surface)  # type: ignore
+            player.draw(self.display_surface)
 
 
 pygame.init()
