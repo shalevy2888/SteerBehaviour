@@ -19,7 +19,7 @@ echo "Running Enviroment Setup"
 echo "1. Checking if Python Virtual Environment already exists:"
 VENV_DIR="./venv"
 if [ ! -d "$VENV_DIR" ]; then
-    echo "1a. Creating Python virtual enviroment into ./vene"
+    echo "1a. Creating Python virtual enviroment into ./venv"
     if [[ $OSTYPE == "linux-gnu" ]]; then  # Windows WSL Ubuntu??
         python3 -m venv ./venv
     elif [[ $OSTYPE == *"darwin"* ]]; then
