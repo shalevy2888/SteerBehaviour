@@ -78,6 +78,7 @@ class MySprite(pygame.sprite.Sprite):
                 #             self.rect.width, self.rect.height)
                 # .inflate(inflate_by, inflate_by))
         screen.blit(self.image, (x, y))
+
         if self.debug_print:
             print(self.collision_rect)
             for r in self.collision_rect:

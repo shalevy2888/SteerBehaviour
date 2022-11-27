@@ -5,10 +5,11 @@ from typing import Optional
 from infra.vmath import Vector
 from steer.formation import Formation
 from steer.movable_entity import MovableEntity
+from steer.squad_behaviour_condition import CondRes
 
 # from steer_behaviour import
 
-SquadForceFunc = Callable[[], None]
+SquadForceFunc = Callable[[bool, float], CondRes]
 
 
 class Squad:
@@ -63,6 +64,9 @@ class Squad:
         if self.squad_behaviour is None:
             return
 
-        self.squad_behaviour()
+        res = self.squad_behaviour(False, dt)
         for e in self.active_iter():
             e.update_steer_behaviour(dt)
+
+        if res != CondRes(CondRes.not_met):
+            self.squad_behaviour = None

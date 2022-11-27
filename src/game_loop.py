@@ -5,11 +5,15 @@ from pygame.math import Vector2
 
 from gfx.sprite import MySprite
 from infra.vmath import Vector
-from steer.formation import FormationDiamond
+from steer.formation import FormationArrowHead
 from steer.movable_entity import MovableEntity
 from steer.movable_entity import Waypoint
+from steer.path import circle_path
+from steer.path import Path
+from steer.path import shift_path
 from steer.squad import Squad
-from steer.squad_behaviour import wander as squad_wander
+from steer.squad_behaviour import path
+from steer.squad_behaviour_condition import infinite_behaviour_condition
 
 # from steer.steer_behaviour import wander
 
@@ -35,6 +39,7 @@ class Ship(MySprite, MovableEntity):
         self.max_force = 25.0
         # self.steer_force = wander()
         self.target = Waypoint.NAWaypoint()
+        self.lead = False
 
     def update(self, dt: float):
         global screen
@@ -66,28 +71,77 @@ class Ship(MySprite, MovableEntity):
 
         self.rect.center = (int(self.fpos.x), int(self.fpos.y))
         self.image = rot_image
+        if self.lead is True:
+            self.image.fill((0, 230, 0, 230), special_flags=pygame.BLEND_RGBA_MULT)
+
+    def draw(self, screen: pygame.Surface):
+        if self.lead is True:
+            # self.image.fill((0, 190, 0, 100), special_flags=pygame.BLEND_ADD)
+            pygame.draw.rect(
+                screen, 'green', pygame.Rect(self.target.pos.x, self.target.pos.y, 3, 3)
+            )
+        if self.target is not None:
+            pygame.draw.line(
+                screen,
+                'yellow',
+                (self.pos.x, self.pos.y),
+                (self.target.pos.x, self.target.pos.y),
+            )
+        super().draw(screen)
+
+
+class VisiblePath:
+    def __init__(self, p: Path) -> None:
+        self.path = p
+
+    def draw(self, screen: pygame.Surface):
+        for idx, v in enumerate(self.path):
+            print(idx, v)
+            pygame.draw.rect(screen, 'red', pygame.Rect(v.x, v.y, 5, 5))
 
 
 class Level:
     def __init__(self, surface):
         self.display_surface = surface
         self.setup_level()
+        self.leader = None
 
     def setup_level(self):
         self.players = pygame.sprite.Group()  # GroupSingle()
         # self.background = pygame.image.load('images/space.png')
+
+        # self.path = VisiblePath(shift_path(patrol_path(8, False, 450, 300, True, False), Vector(100, 100)))
+        self.path = VisiblePath(
+            shift_path(circle_path(250, 0, 20, 1), Vector(350, 350))
+        )
+
         self.s1 = Squad()
         self.s1.entities = [Ship([100, 100]) for _ in range(8)]
-        self.s1.formation = FormationDiamond()
-        self.s1.squad_behaviour = squad_wander(self.s1, 30, SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.s1.formation = FormationArrowHead()
+        self.s1.formation.scale = 0.7
+        self.s1.squad_behaviour = path(
+            infinite_behaviour_condition(), self.path.path, self.s1, True
+        )
+        # squad_wander(self.s1, 30, SCREEN_WIDTH, SCREEN_HEIGHT)
         for e in self.s1.entities:
             self.players.add(e)
+        self.leader = self.s1.get_leader()
+        self.leader.max_force = 65
+        self.leader.lead = True
 
     def run(self, dt: float) -> None:
         # draw level
         screen.fill("black")
+        self.path.draw(self.display_surface)
         # self.display_surface.blit(self.background, [0, 0])
         self.s1.update_squad_behaviour(dt)
+
+        new_leader = self.s1.get_leader()
+        if new_leader != self.leader:
+            if self.leader is not None:
+                self.leader.lead = False
+            self.leader = new_leader
+            self.leader.lead = True
         # player
         player: MySprite
         for player in self.players:

@@ -4,10 +4,20 @@ import math
 import random
 from typing import Callable
 
+from infra.vmath import did_reach_target
 from infra.vmath import Vector
 from steer.formation import Formation
+from steer.globals import ahead_check_radius
+from steer.globals import ahead_search_time
+from steer.globals import follow_slow_radius
+from steer.globals import path_target_radius
+from steer.globals import separation_added_force_magnitude
+from steer.globals import separation_radius
+from steer.globals import wander_divider
+from steer.globals import wander_radius
 from steer.movable_entity import MovableEntity
 from steer.movable_entity import Waypoint
+from steer.path import Path
 from steer.squad import Squad
 
 SteeringForceFunc = Callable[[MovableEntity, Waypoint], Vector]
@@ -67,10 +77,6 @@ def seek(slow_radius: float) -> SteeringForce:
     return SteeringForce(steering_force)
 
 
-wander_radius: float = 20.0
-wander_divider: float = 6.0
-
-
 def wander() -> SteeringForce:
     wander_angle_change = math.pi / wander_divider
     wander_angle = 0.0
@@ -115,12 +121,6 @@ def evade() -> SteeringForce:
     return flee() >= SteeringForce(steering_force)
 
 
-ahead_search_time = 0.5
-separation_added_force_magnitude = 80.0
-ahead_check_radius = 35.0
-follow_slow_radius = 30.0
-separation_radius = 15.0
-
 # TODO: Need to write test
 def follow(distance) -> SteeringForce:
     def steering_force(entity: MovableEntity, leader: Waypoint):
@@ -155,5 +155,49 @@ def separation(squad: Squad):
             added_forces *= -1
             added_forces = added_forces.normalize() * separation_added_force_magnitude
         return added_forces
+
+    return SteeringForce(steering_force)
+
+
+class PathBehaviourWhenDone:
+    nothing = 'nothing'
+    return_to_beginning = 'return to beginning'
+    reverse_direction = 'reverse direction'
+
+    def __init__(self, state) -> None:
+        self.state = state
+
+
+def path(path: Path, when_done: PathBehaviourWhenDone, radius: float) -> SteeringForce:
+    cur_path_index: int = 0
+    path_dir: int = 1
+
+    def steering_force(entity, leader):
+        nonlocal cur_path_index, path_dir
+        if len(path) != 0 and cur_path_index < len(path):
+            target_pos = path[cur_path_index]
+
+            if (
+                did_reach_target(
+                    entity.pos, entity.prev_pos, target_pos, path_target_radius
+                )
+                is True
+            ):
+                cur_path_index += path_dir
+                # println("entity.pos = \(entity.pos) entity.prevPost = \(entity.prevPos) targetPost = \(target_pos) cur_path_index = \(cur_path_index)")
+                if cur_path_index >= len(path) or cur_path_index < 0:
+                    if when_done.state == PathBehaviourWhenDone.nothing:
+                        return Vector.zero()
+                    elif when_done.state == PathBehaviourWhenDone.return_to_beginning:
+                        cur_path_index = 0
+                    elif when_done.state == PathBehaviourWhenDone.reverse_direction:
+                        path_dir *= -1
+                        cur_path_index += 2 * path_dir
+
+                target_pos = path[cur_path_index]
+
+            entity.target = Waypoint(target_pos)
+            return seek(radius)(entity, entity.target)
+        return Vector.zero()
 
     return SteeringForce(steering_force)

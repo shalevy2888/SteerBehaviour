@@ -15,12 +15,13 @@ class Targetable(abc.ABC):
         self.name = f'e{next(Targetable.id)}'
         self.pos: Vector = v
         self.velocity: Vector = Vector()
+        self.prev_pos: Vector = v
 
 
 class Waypoint(Targetable):
     @staticmethod
     def NAWaypoint():  # noqa: N802
-        return Vector(0, 0)
+        return Waypoint(Vector(0, 0))
 
 
 class MovableEntity(Targetable):
@@ -51,6 +52,7 @@ class MovableEntity(Targetable):
             self.max_speed * self.speed_mul
         )
         self.speed_mul = 1.0  # speed_mul needs to be reapplied by the force function
+        self.prev_pos = self.pos
         self.pos = self.pos + (self.velocity * dt)
         angle = get_angle_from(self.velocity, Vector.zero())
         if angle is not None:

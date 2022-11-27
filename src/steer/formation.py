@@ -19,7 +19,7 @@ class Formation:
     @staticmethod
     def rotate(v: Vector, rotation: float) -> Vector:
         """Rotate a vector around 0,0 by degrees rotation"""
-        rotation = math.radians(rotation)
+        # rotation = math.radians(rotation)
         return Vector(
             v.x * math.cos(rotation) - v.y * math.sin(rotation),
             v.x * math.sin(rotation) + v.y * math.cos(rotation),
@@ -42,6 +42,27 @@ class FormationDiamond(Formation):
             Vector(0, -100),
         ]
         self.count = 10
+
+    def _unscaled_entity_position(self, num: int):
+        if num >= self.count:
+            raise IndexError
+        return self._positions[num]
+
+
+class FormationArrowHead(Formation):
+    def __init__(self):
+        Formation.__init__(self)
+        self._positions = [
+            Vector(0, 0),
+            Vector(-40, -40),
+            Vector(40, -40),
+            Vector(-80, -80),
+            Vector(80, -80),
+            Vector(-40, -80),
+            Vector(40, -80),
+            Vector(0, -80),
+        ]
+        self.count = 8
 
     def _unscaled_entity_position(self, num: int):
         if num >= self.count:
