@@ -1,7 +1,9 @@
 import math
+import random
 from typing import Callable
 from typing import List
 
+from infra.vmath import Rect
 from infra.vmath import Vector
 
 Path = List[Vector]
@@ -78,56 +80,97 @@ def patrol_path(
     return patrol_path
 
 
+def in_and_out_path(playable_area: Rect, left_side: bool, randomize: bool) -> Path:
+    random_width = random.uniform(0.8, 1.2) if randomize else 1
+    random_height_adjust = random.uniform(-120.0, 40) if randomize else 40
+    random_radius = random.uniform(3.5, 5) if randomize else 5
+    random_circle_offset = random.uniform(0.15, 0.35) if randomize else 0.15
+
+    return_path = patrol_path(
+        num_points=2,
+        swizzle=False,
+        width=float(playable_area.width) * random_width,
+        height=40,
+        close_path=False,
+        left_to_right=left_side,
+    )
+    return_path = shift_path(
+        path=return_path,
+        by=Vector(
+            x=float(playable_area.width * 0.25),
+            y=float(playable_area.height) + random_height_adjust,
+        ),
+    )
+    radius = float(playable_area.width) / random_radius
+    return_path += shift_path(
+        path=circle_path(
+            radius=radius,
+            starting_angle=float(math.pi),
+            num_of_points=points_in_circle,
+            direction=1 if left_side else -1,
+        ),
+        by=Vector(
+            radius
+            + float(playable_area.width)
+            * (random_circle_offset if left_side else (1 - random_circle_offset)),
+            float(playable_area.height / 2) - random.uniform(90, 30),
+        ),
+    )
+
+    return return_path
+
+
 '''
 func inAndOutPath(playableArea:CGRect, leftSide: Bool, randomize: Bool) -> Path {
-    let randomWidth = randomize ? RandomFloatRange(0.8, max: 1.2) : 1.5
-    let randomHeightAdjust = randomize ? RandomFloatRange(-120, max: 40) : 40
-    let randomRadius = randomize ? RandomFloatRange(3.5,max: 5) : 5
-    let randomCircleOffset = randomize ? RandomFloatRange(0.15,max: 0.35) : 0.15
+    random_width = randomize ? RandomFloatRange(0.8, max: 1.2) : 1.5
+    random_height_adjust = randomize ? RandomFloatRange(-120, max: 40) : 40
+    random_radius = randomize ? RandomFloatRange(3.5,max: 5) : 5
+    random_circle_offset = randomize ? RandomFloatRange(0.15,max: 0.35) : 0.15
 
-    var returnPath = patrolPath(numPoints:2, swizzle:false, width: float(playableArea.width) * randomWidth, height: 40, closePath:false, leftToRight: leftSide)
-    returnPath = shiftPath(path: returnPath,
-        by: Vector(x: -float(playableArea.width * 0.25), y: float(playableArea.height) + randomHeightAdjust))
+    return_path = patrolPath(numPoints:2, swizzle:false, width: float(playableArea.width) * random_width, height: 40, closePath:false, leftToRight: leftSide)
+    return_path = shiftPath(path: return_path,
+        by: Vector(x: -float(playableArea.width * 0.25), y: float(playableArea.height) + random_height_adjust))
 
-    returnPath += (shiftPath(path:
-        circlePath(radius: float(playableArea.width)/randomRadius,
+    return_path += (shiftPath(path:
+        circlePath(radius: float(playableArea.width)/random_radius,
             startingAngle:float(M_PI),
             numOfPoints:pointsInCircle,
             direction: leftSide == true ? 1 : -1),
-        by: Vector(x: float(playableArea.width)*(leftSide==true ? randomCircleOffset : (1-randomCircleOffset)), y: float(playableArea.height/2) -  RandomFloatRange(90,max: 30) )))
+        by: Vector(x: float(playableArea.width)*(leftSide==true ?
+        random_circle_offset : (1-random_circle_offset)), y: float(playableArea.height/2) -  RandomFloatRange(90,max: 30) )))
 
-    return returnPath
+    return return_path
 }
 
 func flowerLeafPath(size size: float) -> Path {
-    var returnPath = Path()
-    returnPath.append(Vector.Zero()) // starting point
+    return_path = Path()
+    return_path.append(Vector.Zero()) // starting point
     // 2:
-    returnPath.append(Vector(x: -size*0.75, y: -size*0.25))
+    return_path.append(Vector(x: -size*0.75, y: -size*0.25))
     // 3:
-    returnPath.append(Vector(x: -size, y: 0))
+    return_path.append(Vector(x: -size, y: 0))
     // 4:
-    returnPath.append(Vector(x: -size*0.75, y: size*0.25))
+    return_path.append(Vector(x: -size*0.75, y: size*0.25))
 
-    return returnPath
+    return return_path
 }
 
 func flowerPath(size size: float, numLeafsInQuad: int, numOfIterations: int, startingAngle: float) -> Path {
-    var returnPath = Path()
-    let rotateAngle = float(M_PI_2) / float(numLeafsInQuad)
+    return_path = Path()
+    rotateAngle = float(M_PI_2) / float(numLeafsInQuad)
 
     for i in 0...(numOfIterations) {
-        let leaf = rotatePath(path: flowerLeafPath(size: size), byAngle: startingAngle + (float(i) * rotateAngle))
-        let leafOpp = rotatePath(path: reversePath(path: leaf), byAngle: float(M_PI))
-        returnPath += leaf
-        returnPath += leafOpp
+        leaf = rotatePath(path: flowerLeafPath(size: size), byAngle: startingAngle + (float(i) * rotateAngle))
+        leafOpp = rotatePath(path: reversePath(path: leaf), byAngle: float(M_PI))
+        return_path += leaf
+        return_path += leafOpp
     }
 
-    return returnPath
+    return return_path
 }
 
 func flowerPath(playableArea playableArea:CGRect, numLeafsInQuad: int, numOfIterations: int, startingAngle: float) -> Path {
-    var path = flowerPath(size: float(min(playableArea.width, playableArea.height)) * 0.42, numLeafsInQuad:numLeafsInQuad, numOfIterations: numOfIterations,
+    path = flowerPath(size: float(min(playableArea.width, playableArea.height)) * 0.42, numLeafsInQuad:numLeafsInQuad, numOfIterations: numOfIterations,
     startingAngle: startingAngle)
 
     path = shiftPath(path: path, by: Vector(x: float(playableArea.width)/2, y: float(playableArea.height)/2 + 50))
@@ -136,17 +179,17 @@ func flowerPath(playableArea playableArea:CGRect, numLeafsInQuad: int, numOfIter
 }
 
 func spiralPath(playableArea playableArea:CGRect, numOfSpirals: int) -> Path {
-    var path = Path()
+    path = Path()
 
-    let circle = circlePath(radius: float(playableArea.width / 5), startingAngle: float(M_PI_2), numOfPoints: pointsInCircle, direction: 1)
+    circle = circlePath(radius: float(playableArea.width / 5), startingAngle: float(M_PI_2), numOfPoints: pointsInCircle, direction: 1)
 
     for i in 1...numOfSpirals {
-        let startingHeight = float(playableArea.height - 50)
-        let movingDown = float(playableArea.height / 2) / float(numOfSpirals)
-        let newCircle = shiftPath(path: circle) { point, index in
-            var h = startingHeight - float(i-1)*movingDown
+        startingHeight = float(playableArea.height - 50)
+        movingDown = float(playableArea.height / 2) / float(numOfSpirals)
+        newCircle = shiftPath(path: circle) { point, index in
+            h = startingHeight - float(i-1)*movingDown
             h -= float(index) * (movingDown / float(pointsInCircle))
-            let newPoint = point + Vector(x: float(playableArea.width/2), y: h)
+            newPoint = point + Vector(x: float(playableArea.width/2), y: h)
             return newPoint
         }
         path += newCircle
@@ -156,17 +199,17 @@ func spiralPath(playableArea playableArea:CGRect, numOfSpirals: int) -> Path {
 }
 
 func vPath(playableArea playableArea:CGRect, xMidPointPercentage: float) -> Path {
-    var path = Path()
+    path = Path()
 
-    var startingPointPerc = RandomFloatRange(0.3, max: 0.5)
+    startingPointPerc = RandomFloatRange(0.3, max: 0.5)
     if xMidPointPercentage > 0.5 {
         startingPointPerc = xMidPointPercentage - startingPointPerc
     } else {
         startingPointPerc = xMidPointPercentage + startingPointPerc
     }
 
-    let midHeightPointX = float(playableArea.width) * xMidPointPercentage
-    let startPointX = float(playableArea.width) * startingPointPerc
+    midHeightPointX = float(playableArea.width) * xMidPointPercentage
+    startPointX = float(playableArea.width) * startingPointPerc
 
     path.append(Vector(x: startPointX, y: float(playableArea.height + 30)))
     path.append(Vector(x: midHeightPointX, y: float(playableArea.height/2)))
@@ -177,22 +220,22 @@ func vPath(playableArea playableArea:CGRect, xMidPointPercentage: float) -> Path
 
 func createPathFromMovement(startingPoint: Vector, startingVelocity: Vector, endPoint:Vector, maxVelocity: float, continuePathAfterPoint: TimeDelta) -> Path {
 
-    let entity = MovableEntityImpl(pos: startingPoint, vel: startingVelocity)
+    entity = MovableEntityImpl(pos: startingPoint, vel: startingVelocity)
     entity.maxVelocity = maxVelocity
     entity.maxSteeringForce = maxVelocity / 2
     entity.target = Waypoint(pos: endPoint)
     entity.mass = 3
 
-    var path = Path()
+    path = Path()
 
     // Calculate max time to reach target so that it is not unlimited:
-    let distance = (endPoint - startingPoint).Length()
-    let maxTime:TimeDelta = TimeDelta(distance / maxVelocity * 3)
+    distance = (endPoint - startingPoint).Length()
+    maxTime:TimeDelta = TimeDelta(distance / maxVelocity * 3)
 
-    let timeDelta:TimeDelta = 0.1
-    var time:TimeDelta = 0
+    timeDelta:TimeDelta = 0.1
+    time:TimeDelta = 0
 
-    let seekForce = seek(0)
+    seekForce = seek(0)
     entity.steerForce = seekForce
 
     while time < maxTime {

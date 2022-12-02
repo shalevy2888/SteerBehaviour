@@ -23,9 +23,9 @@ class TestSquadBehaviour(unittest.TestCase):
         self.assertEqual(e2_formation_pos.x, -25)
         self.assertEqual(e2_formation_pos.y, -25)
         # The second entity should follow the leader unless it's distance is within 35 pixel and than it evades
-        # which will lead his in the exact opposite direction
-        self.assertAlmostEqual(s1.entities[1].pos.x, -2.1213, places=4)
-        self.assertAlmostEqual(s1.entities[1].pos.y, -2.1213, places=4)
+        # which will lead him in the exact opposite direction
+        self.assertAlmostEqual(s1.entities[1].pos.x, -2.7327, places=4)
+        self.assertAlmostEqual(s1.entities[1].pos.y, -1.2378, places=4)
 
 
 if __name__ == '__main__':

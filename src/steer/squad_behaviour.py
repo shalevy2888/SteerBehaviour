@@ -3,6 +3,7 @@ from typing import Optional
 from typing import Tuple
 
 from infra.vmath import Vector
+from steer.globals import path_leader_seek_radius
 from steer.movable_entity import MovableEntity
 from steer.movable_entity import Targetable
 from steer.movable_entity import Waypoint
@@ -87,7 +88,7 @@ def set_entities_follow_target(
                 formation_vector = squad.get_position_delta(entity, leader)
                 entity.target = leader
 
-            entity.steer_force = follow(formation_vector) + separation(squad)
+            entity.steer_force = follow(formation_vector) + (separation(squad) * 0.5)
 
 
 restart_function = Callable[[], None]
@@ -168,7 +169,7 @@ def path(
             steer_path(
                 path,
                 PathBehaviourWhenDone(PathBehaviourWhenDone.return_to_beginning),
-                0,
+                path_leader_seek_radius,
             ),
             Waypoint.NAWaypoint(),
             follow_front,

@@ -10,7 +10,9 @@ from steer.formation import Formation
 from steer.globals import ahead_check_radius
 from steer.globals import ahead_search_time
 from steer.globals import follow_slow_radius
+from steer.globals import follow_velocity_multiplier
 from steer.globals import path_target_radius
+from steer.globals import seek_near_velocity_multiplier
 from steer.globals import separation_added_force_magnitude
 from steer.globals import separation_radius
 from steer.globals import wander_divider
@@ -71,7 +73,8 @@ def seek(slow_radius: float) -> SteeringForce:
         distance = desired_vector.length()
         target_force = entity.max_force
         if distance < slow_radius:
-            target_force = target_force * distance / slow_radius
+            entity.speed_mul_target = seek_near_velocity_multiplier
+            # target_force = max(target_force * (distance / slow_radius), target_force * .5)
         return desired_vector.normalize() * target_force
 
     return SteeringForce(steering_force)
@@ -124,19 +127,24 @@ def evade() -> SteeringForce:
 # TODO: Need to write test
 def follow(distance) -> SteeringForce:
     def steering_force(entity: MovableEntity, leader: Waypoint):
-        ahead = leader.pos + leader.velocity * ahead_search_time
+        rot = leader.rotation - math.pi
+        shaped_distance = leader.shift(Formation.rotate(distance, rot)).pos
+        if True:
+            follow_pos = shaped_distance
+        else:
+            follow_pos = leader.pos  # type: ignore[unreachable]
+        ahead = follow_pos + leader.velocity * ahead_search_time
         distance_from_leader = min(
-            (entity.pos - ahead).length(), (entity.pos - leader.pos).length()
+            (entity.pos - ahead).length(), (entity.pos - follow_pos).length()
         )
         if distance_from_leader < ahead_check_radius:
             return evade()(entity, leader)
         elif distance_from_leader < (ahead_check_radius * 1.5):
-            entity.speed_mul = 1
+            entity.speed_mul_target = 1
         else:
-            entity.speed_mul = 1.2
-        rot = leader.rotation - math.pi
-        shaped_distance = Formation.rotate(distance, rot)
-        return seek(follow_slow_radius)(entity, leader.shift(shaped_distance))
+            entity.speed_mul_target = follow_velocity_multiplier
+
+        return seek(follow_slow_radius)(entity, Waypoint(shaped_distance))
 
     return SteeringForce(steering_force)
 

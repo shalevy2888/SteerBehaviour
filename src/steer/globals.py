@@ -9,9 +9,11 @@ wander_divider: float = 4
 
 flee_multiplier: float = -1
 
-follow_velocity_multiplier: float = 1.35
+follow_velocity_multiplier: float = 1.8
+seek_near_velocity_multiplier: float = 0.55
 exact_follow_distance: float = 15
 keep_pos_history = False
+speed_mul_target_steps = 0.01
 
 # Steering Behaviour Globals - these are sensitive to how big the entities are and should be multiplier by similar factor when changed
 ahead_check_radius: float = 15 * GLOBAL_SCENE_MULTIPLY
@@ -20,6 +22,7 @@ follow_slow_radius: float = 20 * GLOBAL_SCENE_MULTIPLY
 wander_radius: float = 20 * GLOBAL_SCENE_MULTIPLY
 separation_radius: float = 15 * GLOBAL_SCENE_MULTIPLY
 line_size: float = 35 * GLOBAL_SCENE_MULTIPLY
+path_leader_seek_radius: float = 80 * GLOBAL_SCENE_MULTIPLY
 
 # Movable MovableEntityImpl Behaviour Globals - these are sensitive to how big the entities are and should be multiplier by similar factor when changed
 target_reached_radius: float = 5 * GLOBAL_SCENE_MULTIPLY

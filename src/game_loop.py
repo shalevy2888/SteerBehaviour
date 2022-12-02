@@ -1,19 +1,24 @@
+import math
 import sys
 
 import pygame
 from pygame.math import Vector2
 
 from gfx.sprite import MySprite
+from infra.vmath import Rect
 from infra.vmath import Vector
+from steer.formation import Formation
 from steer.formation import FormationArrowHead
 from steer.movable_entity import MovableEntity
 from steer.movable_entity import Waypoint
-from steer.path import circle_path
+from steer.path import in_and_out_path
 from steer.path import Path
-from steer.path import shift_path
 from steer.squad import Squad
 from steer.squad_behaviour import path
 from steer.squad_behaviour_condition import infinite_behaviour_condition
+
+# from steer.path import circle_path
+# from steer.path import shift_path
 
 # from steer.steer_behaviour import wander
 
@@ -35,8 +40,8 @@ class Ship(MySprite, MovableEntity):
         self.rect.center = position
 
         # Moveable entity
-        self.max_speed = 80.0
-        self.max_force = 25.0
+        self.max_speed = 160.0
+        self.max_force = 160.0
         # self.steer_force = wander()
         self.target = Waypoint.NAWaypoint()
         self.lead = False
@@ -80,6 +85,7 @@ class Ship(MySprite, MovableEntity):
             pygame.draw.rect(
                 screen, 'green', pygame.Rect(self.target.pos.x, self.target.pos.y, 3, 3)
             )
+
         if self.target is not None:
             pygame.draw.line(
                 screen,
@@ -96,7 +102,7 @@ class VisiblePath:
 
     def draw(self, screen: pygame.Surface):
         for idx, v in enumerate(self.path):
-            print(idx, v)
+            # print(idx, v)
             pygame.draw.rect(screen, 'red', pygame.Rect(v.x, v.y, 5, 5))
 
 
@@ -111,16 +117,21 @@ class Level:
         # self.background = pygame.image.load('images/space.png')
 
         # self.path = VisiblePath(shift_path(patrol_path(8, False, 450, 300, True, False), Vector(100, 100)))
+        # self.path = VisiblePath(
+        #     shift_path(circle_path(250, 0, 20, 1), Vector(350, 350))
+        # )
         self.path = VisiblePath(
-            shift_path(circle_path(250, 0, 20, 1), Vector(350, 350))
+            in_and_out_path(
+                Rect(150, 150, SCREEN_WIDTH - 300, SCREEN_HEIGHT - 300), True, False
+            )
         )
 
         self.s1 = Squad()
         self.s1.entities = [Ship([100, 100]) for _ in range(8)]
         self.s1.formation = FormationArrowHead()
-        self.s1.formation.scale = 0.7
+        self.s1.formation.scale = 1
         self.s1.squad_behaviour = path(
-            infinite_behaviour_condition(), self.path.path, self.s1, True
+            infinite_behaviour_condition(), self.path.path, self.s1, False
         )
         # squad_wander(self.s1, 30, SCREEN_WIDTH, SCREEN_HEIGHT)
         for e in self.s1.entities:
@@ -128,6 +139,26 @@ class Level:
         self.leader = self.s1.get_leader()
         self.leader.max_force = 65
         self.leader.lead = True
+
+    def draw_formation(self):
+        for entity in self.s1.active_iter():
+            if entity is not self.leader:
+                formation_vector = Vector(0, 0)
+                entity_in_front = self.leader  # self.s1.get_member_in_front_of(entity)
+                if entity_in_front is not None:
+                    formation_vector = self.s1.get_position_delta(
+                        entity, entity_in_front
+                    )
+                    rot = entity_in_front.rotation - math.pi
+                    formation_vector = Formation.rotate(formation_vector, rot)
+                    formation_vector = entity_in_front.shift(formation_vector)
+                    pygame.draw.rect(
+                        screen,
+                        'white',
+                        pygame.Rect(
+                            formation_vector.pos.x, formation_vector.pos.y, 5, 5
+                        ),
+                    )
 
     def run(self, dt: float) -> None:
         # draw level
@@ -147,6 +178,7 @@ class Level:
         for player in self.players:
             player.update(dt)
             player.draw(self.display_surface)
+        self.draw_formation()
 
 
 pygame.init()

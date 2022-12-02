@@ -73,6 +73,14 @@ class Vector:
         )
 
 
+class Rect:
+    def __init__(self, x: float, y: float, width: float, height: float):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+
 def get_angle_from(new_position: Vector, old_position: Vector) -> float | None:
     ydt = new_position.y - old_position.y
     xdt = new_position.x - old_position.x
