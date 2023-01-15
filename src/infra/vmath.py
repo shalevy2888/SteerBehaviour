@@ -73,6 +73,28 @@ class Vector:
         )
 
 
+def sign(x: float) -> float:
+    if x < 0:
+        return -1
+    return 1
+
+
+def clamp(n: float, min_n: float, max_n: float) -> float:
+    return max(min_n, min(n, max_n))
+
+
+def dot(v1: Vector, v2: Vector) -> float:
+    return v1.x * v2.x + v1.y * v2.y
+
+
+def angle_between(v1, v2) -> float:
+    len_mul = v1.length() * v2.length()
+    if len_mul == 0:
+        return 0
+    #  print(dot(v1, v2), len_mul)
+    return math.acos(clamp(dot(v1, v2) / len_mul, -1, 1))
+
+
 class Rect:
     def __init__(self, x: float, y: float, width: float, height: float):
         self.x = x
@@ -115,12 +137,6 @@ def point_on_segment(seg_start: Vector, seg_end: Vector, point: Vector) -> bool:
         return False
 
     return True
-
-
-def sign(x: float) -> float:
-    if x < 0:
-        return -1
-    return 1
 
 
 def line_segment_intersect_circle(

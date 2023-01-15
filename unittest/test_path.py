@@ -8,7 +8,7 @@ from steer.path import patrol_path
 from steer.path import reverse_path
 from steer.path import rotate_path
 from steer.path import shift_path
-from steer.path import shift_path_with_func
+from steer.path import shift_path_with_callable
 
 
 class TestPath(unittest.TestCase):
@@ -35,7 +35,7 @@ class TestPath(unittest.TestCase):
             return Vector(point.x + (index * 2), point.y)
 
         self.assertEqual(
-            shift_path_with_func(path, shift_func),
+            shift_path_with_callable(path, shift_func),
             [Vector(2.0, 1.0), Vector(5.0, 1.0), Vector(9.0, 1.0)],
         )
 

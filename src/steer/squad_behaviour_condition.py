@@ -10,9 +10,9 @@ from steer.globals import path_target_radius
 
 
 class CondRes:
-    not_met = 'Not Met'
-    met = 'Met'
-    abort = 'Abort'
+    not_met = 'Not Met'  # False - condition not met
+    met = 'Met'  # Next - condition met, move to next behaviour
+    abort = 'Abort'  # Abort - Condition met, abort all behaviors
 
     def __init__(self, state: str) -> None:
         self.state = state

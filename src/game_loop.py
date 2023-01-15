@@ -8,14 +8,22 @@ from gfx.sprite import MySprite
 from infra.vmath import Rect
 from infra.vmath import Vector
 from steer.formation import Formation
-from steer.formation import FormationArrowHead
+from steer.formation import FormationArrowHead  # noqa: F401
+from steer.formation import FormationColumn  # noqa: F401
 from steer.movable_entity import MovableEntity
 from steer.movable_entity import Waypoint
-from steer.path import in_and_out_path
+from steer.path import flower_path_area  # noqa: F401
+from steer.path import in_and_out_path  # noqa: F401
 from steer.path import Path
 from steer.squad import Squad
-from steer.squad_behaviour import path
+from steer.squad_behaviour import circles  # noqa: F401
+from steer.squad_behaviour import dive_to  # noqa: F401
+from steer.squad_behaviour import path  # noqa: F401
+from steer.squad_behaviour import patrol_ext  # noqa: F401
+from steer.squad_behaviour import spiral  # noqa: F401
+from steer.squad_behaviour import spiral_in_out  # noqa: F401
 from steer.squad_behaviour_condition import infinite_behaviour_condition
+
 
 # from steer.path import circle_path
 # from steer.path import shift_path
@@ -40,8 +48,8 @@ class Ship(MySprite, MovableEntity):
         self.rect.center = position
 
         # Moveable entity
-        self.max_speed = 160.0
-        self.max_force = 160.0
+        self.max_speed = 240.0
+        self.max_force = 65.0
         # self.steer_force = wander()
         self.target = Waypoint.NAWaypoint()
         self.lead = False
@@ -104,6 +112,14 @@ class VisiblePath:
         for idx, v in enumerate(self.path):
             # print(idx, v)
             pygame.draw.rect(screen, 'red', pygame.Rect(v.x, v.y, 5, 5))
+            if idx + 1 < len(self.path):
+                v2 = self.path[idx + 1]
+                pygame.draw.line(
+                    screen,
+                    'red',
+                    (v.x, v.y),
+                    (v2.x, v2.y),
+                )
 
 
 class Level:
@@ -125,14 +141,37 @@ class Level:
                 Rect(150, 150, SCREEN_WIDTH - 300, SCREEN_HEIGHT - 300), True, False
             )
         )
+        # self.path = VisiblePath(
+        #     flower_path_area(
+        #         Rect(150, 150, SCREEN_WIDTH - 300, SCREEN_HEIGHT - 300),
+        #         num_leafs_in_quad=5,
+        #         starting_angle=0
+        #     )
+        # )
 
         self.s1 = Squad()
         self.s1.entities = [Ship([100, 100]) for _ in range(8)]
-        self.s1.formation = FormationArrowHead()
-        self.s1.formation.scale = 1
-        self.s1.squad_behaviour = path(
-            infinite_behaviour_condition(), self.path.path, self.s1, False
+        self.s1.formation = FormationColumn()
+        self.s1.formation.scale = 0.75
+        # self.s1.squad_behaviour = path(
+        #     infinite_behaviour_condition(), self.path.path, self.s1, False
+        # )
+        # self.s1.squad_behaviour = patrol_ext(infinite_behaviour_condition(), self.s1,
+        #                                      8, True, Rect(50, 50, 350, 500))
+        # self.s1.squad_behaviour = circles(infinite_behaviour_condition(), self.s1,
+        #                                   Rect(150, 150, SCREEN_WIDTH - 300, SCREEN_HEIGHT - 300))
+
+        self.s1.squad_behaviour = spiral_in_out(
+            infinite_behaviour_condition(),
+            3,
+            self.s1,
+            Rect(150, 150, SCREEN_WIDTH - 300, SCREEN_HEIGHT - 400),
         )
+
+        # self.s1.squad_behaviour = dive_to(infinite_behaviour_condition(), self.s1, 100, 1100)
+
+        if self.s1.squad_behaviour._debug_path is not None:
+            self.path = VisiblePath(self.s1.squad_behaviour._debug_path)
         # squad_wander(self.s1, 30, SCREEN_WIDTH, SCREEN_HEIGHT)
         for e in self.s1.entities:
             self.players.add(e)

@@ -4,6 +4,7 @@ import math
 import random
 from typing import Callable
 
+from infra.vmath import angle_between
 from infra.vmath import did_reach_target
 from infra.vmath import Vector
 from steer.formation import Formation
@@ -13,16 +14,18 @@ from steer.globals import follow_slow_radius
 from steer.globals import follow_velocity_multiplier
 from steer.globals import path_target_radius
 from steer.globals import seek_near_velocity_multiplier
+from steer.globals import seek_near_velocity_power
 from steer.globals import separation_added_force_magnitude
 from steer.globals import separation_radius
 from steer.globals import wander_divider
 from steer.globals import wander_radius
 from steer.movable_entity import MovableEntity
+from steer.movable_entity import Targetable
 from steer.movable_entity import Waypoint
 from steer.path import Path
 from steer.squad import Squad
 
-SteeringForceFunc = Callable[[MovableEntity, Waypoint], Vector]
+SteeringForceFunc = Callable[[MovableEntity, Targetable], Vector]
 
 
 class SteeringForce:
@@ -71,10 +74,17 @@ def seek(slow_radius: float) -> SteeringForce:
     def steering_force(entity: MovableEntity, waypoint: Waypoint) -> Vector:
         desired_vector = waypoint.pos - entity.pos
         distance = desired_vector.length()
-        target_force = entity.max_force
+        target_force = entity.max_force * entity._force_mul
+
+        abp = (
+            (math.pi - angle_between(entity.velocity, desired_vector)) / math.pi
+        ) ** seek_near_velocity_power
+        entity.speed_mul_target = abp * seek_near_velocity_multiplier + (
+            1 - seek_near_velocity_multiplier
+        )
         if distance < slow_radius:
-            entity.speed_mul_target = seek_near_velocity_multiplier
-            # target_force = max(target_force * (distance / slow_radius), target_force * .5)
+            entity.speed_mul_target *= seek_near_velocity_multiplier
+        #     # target_force = max(target_force * (distance / slow_radius), target_force * .5)
         return desired_vector.normalize() * target_force
 
     return SteeringForce(steering_force)
@@ -126,23 +136,24 @@ def evade() -> SteeringForce:
 
 # TODO: Need to write test
 def follow(distance) -> SteeringForce:
-    def steering_force(entity: MovableEntity, leader: Waypoint):
-        rot = leader.rotation - math.pi
-        shaped_distance = leader.shift(Formation.rotate(distance, rot)).pos
-        if True:
-            follow_pos = shaped_distance
-        else:
-            follow_pos = leader.pos  # type: ignore[unreachable]
-        ahead = follow_pos + leader.velocity * ahead_search_time
+    def steering_force(entity: MovableEntity, target: MovableEntity):
+        rot = target.rotation - math.pi
+        shaped_distance = target.shift(Formation.rotate(distance, rot)).pos
+        ahead = shaped_distance + target.velocity * ahead_search_time
         distance_from_leader = min(
-            (entity.pos - ahead).length(), (entity.pos - follow_pos).length()
+            (entity.pos - ahead).length(), (entity.pos - shaped_distance).length()
         )
         if distance_from_leader < ahead_check_radius:
-            return evade()(entity, leader)
+            return evade()(entity, target)
         elif distance_from_leader < (ahead_check_radius * 1.5):
+            entity.speed_mul_target = 0.7
+            entity.force_mul_target = 0.7
+        elif distance_from_leader < (ahead_check_radius * 2.5):
             entity.speed_mul_target = 1
+            entity.force_mul_target = 1
         else:
             entity.speed_mul_target = follow_velocity_multiplier
+            entity.force_mul_target = follow_velocity_multiplier * 4
 
         return seek(follow_slow_radius)(entity, Waypoint(shaped_distance))
 

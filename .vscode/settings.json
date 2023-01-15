@@ -4,6 +4,7 @@
         "centerx",
         "centery",
         "fpos",
+        "ppath",
         "pygame",
         "Targetable",
         "vmath",

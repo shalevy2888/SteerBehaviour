@@ -9,11 +9,15 @@ wander_divider: float = 4
 
 flee_multiplier: float = -1
 
+# velocity multiplier and decay
 follow_velocity_multiplier: float = 1.8
-seek_near_velocity_multiplier: float = 0.55
+seek_near_velocity_multiplier: float = 0.75
+seek_near_velocity_power: float = 5
+velocity_decay_max = 0.4
+
 exact_follow_distance: float = 15
 keep_pos_history = False
-speed_mul_target_steps = 0.01
+speed_mul_target_steps = 0.1
 
 # Steering Behaviour Globals - these are sensitive to how big the entities are and should be multiplier by similar factor when changed
 ahead_check_radius: float = 15 * GLOBAL_SCENE_MULTIPLY

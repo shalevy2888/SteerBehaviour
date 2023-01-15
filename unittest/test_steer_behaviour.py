@@ -8,6 +8,8 @@ from steer.steer_behaviour import pursuit
 from steer.steer_behaviour import seek
 from steer.steer_behaviour import wander
 
+# from steer.globals import seek_near_velocity_multiplier
+
 
 class TestSteerBehaviour(unittest.TestCase):
     def test_seek(self):
